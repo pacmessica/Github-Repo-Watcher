@@ -19,7 +19,7 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
     {:ok, %HTTPoison.Response{status_code: 200, body: body}} =
       HTTPoison.post(
         "https://api.github.com/graphql",
-        Poison.encode!(%{"query" => query(username)}),
+        buildUserQuery(username),
         [{"Authorization", "bearer #{token}"}, {"Content-Type", "application/json"}]
       )
 
@@ -31,24 +31,31 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
     data.user
   end
 
-  defp query(username) do
-    "query {
-      user(login: \"#{username}\") {
-        avatarUrl
-        location
-        name
-        watching(first:4) {
-          pageInfo {
-            endCursor
-            hasNextPage
-          }
-          nodes {
+  defp buildUserQuery(username) do
+    {:ok, graphql} =
+      Poison.encode(%{
+        query: """
+        query($username:String!) {
+          user(login: $username) {
+            avatarUrl
+            location
             name
-            description
-            url
+            watching(first:4) {
+              pageInfo {
+                endCursor
+                hasNextPage
+              }
+              nodes {
+                name
+                description
+                url
+              }
+            }
           }
         }
-      }
-    }"
+        """,
+        variables: %{username: username}
+      })
+    graphql
   end
 end
