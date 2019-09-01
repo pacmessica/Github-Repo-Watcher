@@ -2,33 +2,49 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
   use GithubRepoWatcherWeb, :controller
   require Logger
 
-  def show(conn, %{"username" => username}) do
-    case get_github_user(username) do
-      {:ok, user} ->
-        github_user = %{
-          name: user.name,
-          avatar_url: user.avatarUrl,
-          username: username,
-          location: user.location,
-          repos: user.watching.nodes
-        }
+  def show(conn, params) do
+    username = Map.get(params, "username")
 
-        render(conn, "show.html", github_user: github_user)
+    if username == nil do
+      conn
+      |> put_flash(:info, "username must be provided")
+      |> redirect(to: "/")
+    else
+      {cursor, cursor_type} =
+        if Map.has_key?(params, "beforeCursor") do
+          {Map.get(params, "beforeCursor"), "before"}
+        else
+          {Map.get(params, "afterCursor", ""), "after"}
+        end
 
-      {:error, error} ->
-        conn
-        |> put_flash(:error, error)
-        |> redirect(to: "/")
+      case get_github_user(username, cursor, cursor_type) do
+        {:ok, user} ->
+          github_user = %{
+            name: user.name,
+            avatar_url: user.avatarUrl,
+            username: username,
+            location: user.location,
+            repos: user.watching.nodes,
+            pageInfo: user.watching.pageInfo
+          }
+
+          render(conn, "show.html", github_user: github_user)
+
+        {:error, error} ->
+          conn
+          |> put_flash(:error, error)
+          |> redirect(to: "/")
+      end
     end
   end
 
-  defp get_github_user(username) do
+  defp get_github_user(username, cursor, cursor_type) do
     token = System.get_env("GITHUB_TOKEN")
 
     {:ok, %HTTPoison.Response{status_code: 200, body: body}} =
       HTTPoison.post(
         "https://api.github.com/graphql",
-        buildUserQuery(username),
+        build_user_query(username, cursor, cursor_type),
         [{"Authorization", "bearer #{token}"}, {"Content-Type", "application/json"}]
       )
 
@@ -37,7 +53,7 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
     if Map.has_key?(result, :errors) do
       err = hd(result.errors)
 
-      case err.type do
+      case Map.get(err, "type") do
         "NOT_FOUND" ->
           {:error, "Github user '#{username}' not found"}
 
@@ -50,19 +66,28 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
     end
   end
 
-  defp buildUserQuery(username) do
+  defp build_user_query(username, cursor, input_cursor_type) do
+    {limit_type, cursor_type} =
+      if input_cursor_type == "before" do
+        {"last", "before"}
+      else
+        {"first", "after"}
+      end
+
     {:ok, graphql} =
       Poison.encode(%{
         query: """
-        query($username:String!) {
+        query($username:String!, $cursor:String!) {
           user(login: $username) {
             avatarUrl
             location
             name
-            watching(first:4) {
+            watching(#{limit_type}:15 #{cursor_type}: $cursor) {
               pageInfo {
+                startCursor
                 endCursor
                 hasNextPage
+                hasPreviousPage
               }
               nodes {
                 name
@@ -73,7 +98,7 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
           }
         }
         """,
-        variables: %{username: username}
+        variables: %{username: username, cursor: cursor}
       })
 
     graphql

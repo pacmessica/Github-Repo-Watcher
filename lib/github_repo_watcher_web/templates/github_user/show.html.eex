@@ -8,6 +8,7 @@
     </div>
   </div>
   <ul class="github_repos_container">
+    <h4>Following repositories</h4>
     <%= for repo <- @github_user.repos do %>
       <li class="repo">
         <b><a href="<%=repo.url %>"> <%=repo.name %></a><%= if repo.description !== nil do %>:<% end%></b>
@@ -15,4 +16,10 @@
       </li>
     <% end %>
   </ul>
+  <%= if @github_user.pageInfo.hasPreviousPage do %>
+    <a href="/github_users?username=<%=@github_user.username%>&beforeCursor=<%=@github_user.pageInfo.startCursor%>">Previous</a>
+  <% end %>
+  <%= if @github_user.pageInfo.hasNextPage do %>
+    <a href="/github_users?username=<%=@github_user.username%>&afterCursor=<%=@github_user.pageInfo.endCursor%>">Next</a>
+  <% end %>
 </section>
