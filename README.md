@@ -10,7 +10,7 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 ## Set up github token
 
-Save your github token to your .env file under the key `GITHUB_TOKEN`.
+In the root of our app, create a `.env` file. Save your github token to your .env file under the key `GITHUB_TOKEN`.
 
 
     export GITHUB_TOKEN=your_github_token
