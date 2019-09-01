@@ -11,7 +11,7 @@
     <h4>Following repositories</h4>
     <%= for repo <- @github_user.repos do %>
       <li class="repo">
-        <b><a href="<%=repo.url %>"> <%=repo.name %></a><%= if repo.description !== nil do %>:<% end%></b>
+        <b><a href="<%=repo.url %>" target="_blank"> <%=repo.name %></a><%= if repo.description !== nil do %>:<% end%></b>
         <%=repo.description %>
       </li>
     <% end %>
