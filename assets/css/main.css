@@ -1,18 +1,59 @@
 .container{
   margin: 0 auto;
-  max-width: 80.0rem;
   padding: 0 2.0rem;
   position: relative;
-  width: 100%
 }
 .header img {
-  width: 100px;
+  height: 80px;
   display: inline-block;
 }
 
 .header div {
   display: inline-block;
   font-size: 30px;
+}
+
+.github_user_container {
+  height: 80px;
+  display: block;
+}
+
+.user_info {
+  display: inline-block;
+  margin: 0px 0px 0px 10px;
+}
+
+
+
+.github_user_container h3 {
+  margin: 0px;
+}
+
+.github_user_container p {
+  margin: 0px;
+  color: grey;
+}
+/*
+.github_user_container p {
+  display: inline-block;
+  margin: 0px 0px 0px 10px;
+} */
+
+
+.github_user_container img {
+  /* width: 200px; */
+    height: 5em;
+  border-radius: 5px;
+  float: left;
+}
+
+
+.github_repos_container {
+  display: block;
+}
+
+.github_repos_container a {
+  text-decoration: none;
 }
 
 /* Alerts*/

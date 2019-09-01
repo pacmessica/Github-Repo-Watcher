@@ -1,3 +1,18 @@
 <section>
-  Name: <%= @github_user.name %>
+  <div class="github_user_container">
+    <img src="<%= @github_user.avatar_url%>" alt="avatar"/>
+    <div class="user_info">
+      <h3><%= @github_user.name %></h3>
+      <p><%= @github_user.username %></p>
+      <p><%= @github_user.location %></p>
+    </div>
+  </div>
+  <ul class="github_repos_container">
+    <%= for repo <- @github_user.repos do %>
+      <li class="repo">
+        <b><a href="<%=repo.url %>"> <%=repo.name %></a><%= if repo.description !== nil do %>:<% end%></b>
+        <%=repo.description %>
+      </li>
+    <% end %>
+  </ul>
 </section>

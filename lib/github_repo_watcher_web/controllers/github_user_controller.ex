@@ -8,7 +8,9 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
         github_user = %{
           name: user.name,
           avatar_url: user.avatarUrl,
-          location: user.location
+          username: username,
+          location: user.location,
+          repos: user.watching.nodes
         }
 
         render(conn, "show.html", github_user: github_user)
