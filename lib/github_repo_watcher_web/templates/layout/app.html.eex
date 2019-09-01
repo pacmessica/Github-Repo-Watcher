@@ -11,7 +11,9 @@
     <header>
       <section class="container">
         <div class="header">
-          <div>Github Repo Watcher</div>
+          <a href="/">
+            <div>Github Repo Watcher</div>
+          </a>
         </div>
       </section>
     </header>
