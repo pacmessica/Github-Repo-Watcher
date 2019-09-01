@@ -14,6 +14,9 @@ config :github_repo_watcher, GithubRepoWatcherWeb.Endpoint,
   render_errors: [view: GithubRepoWatcherWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: GithubRepoWatcher.PubSub, adapter: Phoenix.PubSub.PG2]
 
+config :github_repo_watcher,
+  github_client: GithubRepoWatcher.GithubClient
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

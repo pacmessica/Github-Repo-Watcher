@@ -16,6 +16,6 @@ In the root of our app, create a `.env` file. Save your github token to your .en
     export GITHUB_TOKEN=your_github_token
 
 
-Type `source .env` for each terminal you are using.
+Type `source .env` for each terminal you are using (Note: you may need to restart the server).
 
 To get a github token, follow the instructions [here](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line).

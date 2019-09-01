@@ -40,7 +40,8 @@ defmodule GithubRepoWatcher.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 3.1"},
-      {:httpoison, "~> 1.5"}
+      {:httpoison, "~> 1.5"},
+      {:mox, "~> 0.5.1"}
     ]
   end
 end
