@@ -1,16 +1,23 @@
 defmodule GithubRepoWatcherWeb.GithubUserController do
   use GithubRepoWatcherWeb, :controller
+  require Logger
 
   def show(conn, %{"username" => username}) do
-    data = get_github_user(username)
+    case get_github_user(username) do
+      {:ok, user} ->
+        github_user = %{
+          name: user.name,
+          avatar_url: user.avatarUrl,
+          location: user.location
+        }
 
-    github_user = %{
-      name: data.name,
-      avatar_url: data.avatarUrl,
-      location: data.location
-    }
+        render(conn, "show.html", github_user: github_user)
 
-    render(conn, "show.html", github_user: github_user)
+      {:error, error} ->
+        conn
+        |> put_flash(:error, error)
+        |> redirect(to: "/")
+    end
   end
 
   defp get_github_user(username) do
@@ -23,12 +30,22 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
         [{"Authorization", "bearer #{token}"}, {"Content-Type", "application/json"}]
       )
 
-    decode_json(body)
-  end
+    result = Poison.decode!(body, keys: :atoms)
 
-  defp decode_json(body) do
-    %{data: data} = Poison.decode!(body, keys: :atoms)
-    data.user
+    if Map.has_key?(result, :errors) do
+      err = hd(result.errors)
+
+      case err.type do
+        "NOT_FOUND" ->
+          {:error, "Github user '#{username}' not found"}
+
+        _ ->
+          Logger.error("Error when calling github api: #{err.message}")
+          {:error, "Internal Error"}
+      end
+    else
+      {:ok, result.data.user}
+    end
   end
 
   defp buildUserQuery(username) do
@@ -56,6 +73,7 @@ defmodule GithubRepoWatcherWeb.GithubUserController do
         """,
         variables: %{username: username}
       })
+
     graphql
   end
 end
