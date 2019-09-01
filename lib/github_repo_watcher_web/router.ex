@@ -17,6 +17,7 @@ defmodule GithubRepoWatcherWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+		get "/github_users/:username", GithubUserController, :show
   end
 
   # Other scopes may use custom stacks.
